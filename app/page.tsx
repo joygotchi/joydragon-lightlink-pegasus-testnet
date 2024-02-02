@@ -99,7 +99,7 @@ const { data: allowance, refetch } = useContractRead({
 			}
 		},[])
 	return (
-		<section className="h-full max-w-lg  mx-auto font-medium bg-slate-50 px-8 bg-no-repeat bg-container bg-black bg-center" style={{backgroundImage: "url(/Assets/landing.png)"}}>
+		<section className="h-full max-w-lg  mx-auto font-medium bg-slate-50 px-8 bg-no-repeat bg-container bg-gray-500 bg-center" style={{backgroundImage: "url(/Assets/landing.png)"}}>
  
       <div>{errorSwitchNetwork && errorSwitchNetwork.message}</div>
 			<div className="inline-block max-w-lg text-center justify-center">
