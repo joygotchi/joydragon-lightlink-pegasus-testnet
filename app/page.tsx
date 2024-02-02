@@ -109,7 +109,7 @@ const { data: allowance, refetch } = useContractRead({
 
 {isClient ? (
 (!isApprove) ? (
-	<div className="pb-5" style={{paddingTop:"75%"}}>
+	<div className="pb-5" style={{paddingTop:"130%"}}>
 			<button type="button"   onClick={approveAsync} className="nes-btn bg-white w-full" >
 	Approval
 </button>
@@ -118,7 +118,7 @@ const { data: allowance, refetch } = useContractRead({
 
    ):(
 <>
-<div className="pt-80 pb-5">
+<div className="pb-5"  style={{paddingTop:"130%"}}>
 <button type="button" style={{backgroundImage: "url(/Assets/mint.png)"}} className=" bg-no-repeat bg-center w-full h-16 " disabled={!mint || isLoading} onClick={mint}> </button>
 	
 </div>
