@@ -126,7 +126,7 @@ export default function Battle() {
 			  <div className="relative flex justify-end items-center gap-2">
 				{
 		 ownPet &&	ownPet[3] <  pet[3]  && pet[1] !== 4 && ownPet[1] !== 4 &&  ownPet[6] == BigInt("0") && (pet[5] == BigInt("0")  ||  Math.floor((( Math.abs(Number(new Date( Number(pet[5]) )) * 1000  - Date.now())) /1000)/60)/60 > 1)    && (
-<Button isIconOnly size="sm" className="p-2" color="default" aria-label="Like" onPress={()=>onAttack(data.tokenId)}>
+<Button isIconOnly size="sm" className="p-2" color="default" aria-label="Like" onPress={()=>onAttack(data.id)}>
 	   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 				 <g>
 					 <path fill="none" d="M0 0h24v24H0z"/>
@@ -138,7 +138,7 @@ export default function Battle() {
 		}
 		{
 		 ownedPetId &&  pet[1] == 4   &&(
-<Button isIconOnly size="sm" className="p-2" color="default" aria-label="Like" onPress={()=>onKill(data.tokenId)}>
+<Button isIconOnly size="sm" className="p-2" color="default" aria-label="Like" onPress={()=>onKill(data.id)}>
 <Image
     radius={"none"}
     width={40}
