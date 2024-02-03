@@ -18,7 +18,7 @@ import {
 	useBalance,
 	useSwitchNetwork
   } from "wagmi";
-  
+  import { readContracts , watchAccount  , writeContract ,prepareWriteContract} from '@wagmi/core'
 const MAX_ALLOWANCE = BigInt('20000000000000000000000')
 
 //https://wagmi.sh/examples/contract-write
@@ -55,6 +55,13 @@ const { data: allowance, refetch } = useContractRead({
     error:errorAllowance,
   } = useContractWrite(configAllowance);
 
+  const { isLoading : isLoadingApprove} = useWaitForTransaction({
+	hash: approveResult?.hash,
+		onSuccess(data) {
+			setIsApprove(true)
+			fetchMyAPI();
+		}
+  })
   const { config : configFaucet } = usePrepareContractWrite({
 	address: `0x${process.env.FAUCET_ADDRESS?.slice(2)}`,
 	abi: [
@@ -101,22 +108,23 @@ const { data: allowance, refetch } = useContractRead({
 	});
   
 	const {
-	  data: faucetData,
+	  data: faucetResult,
 	  writeAsync: setFaucetAsync,
 	  error:errorFaucet,
 	} = useContractWrite(configFaucet);
 
 	const onFaucet = ()=> {
 		setFaucetAsync?.();
-		fetchMyAPI();
 		};
   
-  const { isLoading : isLoadingApprove} = useWaitForTransaction({
-	hash: approveResult?.hash,
-		onSuccess(data) {
-			fetchMyAPI();
-		}
-  })
+		const { isLoading : isLoadingFaucet} = useWaitForTransaction({
+			hash: faucetResult?.hash,
+				onSuccess(data) {
+					setIsBlance(true)
+					fetchMyAPI();
+				}
+		  })
+
 	
 	const {
 		config,
@@ -136,7 +144,23 @@ const { data: allowance, refetch } = useContractRead({
 		}
 	  })
 	  
+	  const onMint = async() =>{
+		const config =  await prepareWriteContract({
+		  address: `0x${process.env.NFT_ADDRESS?.slice(2)}`,
+		  abi: nftAbi,
+		  functionName: "mint",
+		})
+		 const tx = await writeContract(config);
+		 if(tx){
+			console.log("tx",tx);
+			fetchMyAPI();
+			// let response : any= await fetch(`${process.env.EXPLORER_URL}/api/v2/transactions/${tx.hash}/logs`)
+    		// response = await response.json()
+			// console.log("logs",response);
+		  //fetchMyAPI();
+		 }
 
+	 }
 
 	  const { chains , error : errorSwitchNetwork, isLoading : loadingSwingNetwork, pendingChainId, switchNetwork } =
 		useSwitchNetwork({
@@ -155,7 +179,7 @@ const { data: allowance, refetch } = useContractRead({
 		  const fetchMyAPI = async() => {
 			if(allowance){
 				console.log("allowance",allowance)
-				if(allowance >= BigInt(20000)){
+				if(allowance >= 10000){
 					setIsApprove(true)
 				}
 			}
@@ -186,56 +210,41 @@ const { data: allowance, refetch } = useContractRead({
 			</div>
 
 {isClient ? (
-(!isApprove) ? (
-	(isBlance) ? (
+	(!isEthBlance) ? (
 		<div className="pb-5" style={{paddingTop:"130%"}}>
-		<button type="button"   onClick={approveAsync} className="nes-btn bg-white w-full" >
-Approval
-</button>
+		<Button
+href={process.env.URL_FAUCET as string}
+as={Link}
+className="w-full"
+color="primary"
+showAnchorIcon
+variant="solid"
+>
+Faucet ${process.env.TOKEN as string} Testnet
+</Button>
 </div>
-	) : (
-		<div className="pb-5" style={{paddingTop:"130%"}}>
-		<button type="button"   onClick={onFaucet} className="nes-btn bg-white w-full" >
-Faucet $JGT Token
-</button>
-</div>
-	)
-   ):(
-	(isBlance && isEthBlance) ? (
-<>
-<div className="pb-5"  style={{paddingTop:"130%"}}>
-<button type="button" style={{backgroundImage: "url(/Assets/press_to_mint.gif)"}} className=" bg-no-repeat bg-center w-full h-16 " onClick={mint}> </button>
-	
-</div>
-
-</>
-	) :(
-		(!isBlance) ? (
+	):(
+		(!isApprove) ? (
 			<div className="pb-5" style={{paddingTop:"130%"}}>
-			<button type="button"   onClick={onFaucet} className="nes-btn bg-white w-full" >
-	Faucet $JGT Token
+			<button type="button"   onClick={approveAsync} className="nes-btn bg-white w-full" >
+	Approval
 	</button>
 	</div>
 		) :(
-
-			<div className="pb-5" style={{paddingTop:"130%"}}>
-					<Button
-      href={process.env.URL_FAUCET as string}
-      as={Link}
-	  className="w-full"
-      color="primary"
-      showAnchorIcon
-      variant="solid"
-    >
-      Faucet ${process.env.TOKEN as string} Testnet
-    </Button>
-	</div>
+			(!isBlance) ? (
+				<div className="pb-5" style={{paddingTop:"130%"}}>
+				<button type="button"   onClick={onFaucet} className="nes-btn bg-white w-full" >
+		Faucet $JGT Token
+		</button>
+		</div>
+			) 	:(
+				<div className="pb-5"  style={{paddingTop:"130%"}}>
+<button type="button" style={{backgroundImage: "url(/Assets/press_to_mint.gif)"}} className=" bg-no-repeat bg-center w-full h-16 " onClick={onMint}> </button>
+	
+</div>
+			)
 		)
-
 	)
-
-
-   )
 
 ) : (
 	<>

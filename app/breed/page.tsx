@@ -11,6 +11,7 @@ import {
   import { readContracts , watchAccount  , writeContract ,prepareWriteContract} from '@wagmi/core'
 export default function BreadPage() {
 	const [isAddress, setIsAddress] = React.useState<any>(false)
+	const [petData, setPetData] = React.useState<any>(null)
 	const [petDataA, setPetDataA] = React.useState<any>(null)
 	const [petDataB, setPetDataB] = React.useState<any>(null)
 	const [petImagePetA, setImagePetA] = React.useState<any>(null)
@@ -122,6 +123,8 @@ export default function BreadPage() {
 		let response : any= await fetch(`${process.env.EXPLORER_URL}/api/v2/tokens/${process.env.NFT_ADDRESS}/instances`)
 		response = await response.json()
 		const petArr : any = [];
+		const petArrA : any = [];
+		const petArrB : any = [];
 		console.log("petcheck",response)
 		if(response.items){
 		  for (const element of response.items) {
@@ -163,21 +166,68 @@ export default function BreadPage() {
 				status:Info[0].result[1],
 				evol:InfoEvol[0].result[1]
 			  })
+			  if(InfoAttr[0].result[4] == 0 && Info[0].result[1] !== 4 && InfoEvol[0].result[1] == 2){
+				petArrA.push({
+					value:element.id,
+					label:Info[0].result[0],
+					sex:InfoAttr[0].result[4],
+					status:Info[0].result[1],
+					evol:InfoEvol[0].result[1]
+				  })
+			  }
+			  if(InfoAttr[0].result[4] == 1 && Info[0].result[1] !== 4 && InfoEvol[0].result[1] == 2){
+				petArrB.push({
+					value:element.id,
+					label:Info[0].result[0],
+					sex:InfoAttr[0].result[4],
+					status:Info[0].result[1],
+					evol:InfoEvol[0].result[1]
+				  })
+			  }
 			}
 		  }
+		  console.log("petArr",petArr)
+		  console.log("petArrA",petArrA)
+		  console.log("petArrB",petArrB)
+		  if(petArrA.length > 0 ){
+			setSelectedPetA(petArrA[0].value)
+			const InfoIPFS : any = await readContracts({
+				contracts: [
+				  {
+					address: `0x${process.env.NFT_ADDRESS?.slice(2)}`,
+					abi: nftAbi,
+					functionName: 'getPetImage',
+					args: [petArrA[0].value],
+				  }
+				],
+			  })
+			  setImagePetA(InfoIPFS[0].result)
+			setIsPet(true)
+		  }
+		  if(petArrB.length > 0 ){
+			setSelectedPetB(petArrB[0].value)
+			const InfoIPFS : any = await readContracts({
+				contracts: [
+				  {
+					address: `0x${process.env.NFT_ADDRESS?.slice(2)}`,
+					abi: nftAbi,
+					functionName: 'getPetImage',
+					args: [petArrB[0].value],
+				  }
+				],
+			  })
+			  setImagePetB(InfoIPFS[0].result)
+			setIsPet(true)
+		  }
+		  setPetData(petArr)
+		  setPetDataA(petArrA)
+		  setPetDataB(petArrB)
 		}
-	console.log("petArr",petArr)
 	
-	setPetDataA(petArr)
-	setPetDataA(petArr.filter((pet:any)=>pet.sex == 0 && pet.status !== 4 && pet.evol == 2 ))
-	setPetDataB(petArr.filter((pet:any)=>pet.sex == 1 && pet.status !== 4  && pet.evol == 2))
+
+
 	
-	  if(petArr.length > 2 ){
-		setSelectedPetA(0)
-		setSelectedPetB(0)
-		
-		setIsPet(true)
-	  }
+	 
 	  if(petArr.length == 0 ){
 		setIsPet(false)
 	  }

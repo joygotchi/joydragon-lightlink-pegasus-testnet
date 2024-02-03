@@ -248,9 +248,9 @@ export default function PetPage() {
       setPetName(event.target.value);
     };
     const handleChangeSelectPet = async ( event : any )=> {
-      localStorage.setItem('pet',event.target.value);
-      setSelectedPet(event.target.value);
-      fetchMyAPI();
+      await localStorage.setItem('pet',event.target.value);
+      await setSelectedPet(event.target.value);
+      await fetchMyAPI();
     };
     const onChangePetName = () =>{
        setPetNameAsync?.();
@@ -505,12 +505,12 @@ src="/gotchi/Assets/Dead.png"
 />
   </div>
   <div className="flex justify-center pt-5">
-    {ownPetEvol &&  ownPetEvol[1] == 0 && ownPet[3] > 1  && (
+    {ownPetEvol &&  ownPetEvol[1] == 0 && ownPet[3] > 1  &&  ownPet[1] !== 4 && (
   <Button  color="warning" variant="solid" size="sm" aria-label="Like" onClick={onEvol}>
   Ready for Evolution 2
  </Button>
     )}
-    {ownPetEvol &&  ownPetEvol[1] == 1 && ownPet[3] > 2  && (
+    {ownPetEvol &&  ownPetEvol[1] == 1 && ownPet[3] > 2 &&  ownPet[1] !== 4 && (
   <Button  color="warning" variant="solid" size="sm" aria-label="Like" onClick={onEvol}>
   Ready for Evolution 3
  </Button>
@@ -587,7 +587,7 @@ labelPlacement="outside"
 <div className="col-start-1 col-end-7 ">
   <Progress size="sm" color="default" aria-label="" value={100} /></div>
 
-  <div className="col-start-1 col-end-3 text-white ">{ownPetEvol && ownPetEvol[4] == 0 ? "male" : ownPetEvol && ownPetEvol[4] == 1 ? "female" : ""}</div>
+  <div className="col-start-1 col-end-3 text-white ">{ownPetAttr && ownPetAttr[4] == "0" ? "male" : ownPetAttr && ownPetAttr[4] == "1" ? "female" : ""}</div>
 <div className="col-end-8 col-span-3  text-white">Reward:{ownPet ? ownPet[8].toString() : ''} ETH</div>
 
 
@@ -608,21 +608,21 @@ labelPlacement="outside"
          <div className="col-start-1 col-end-7 ">
   
   <div className="flex justify-center pt-7">
-    {item.name == "Beef" && ownPet[1] == 4  && (
+    {item.name == "Beef"  && (
       <Image
       width={100}
   radius={"none"}
   src="/gotchi/Assets/Item_Beef.png"
   />
     )}
-    {item.name == "Shield" && ownPet[1] == 4  && (
+    {item.name == "Shield"  && (
       <Image
       width={80}
   radius={"none"}
   src="/gotchi/Assets/Item_Shield.png"
   />
     )}
-      {item.name == "Water" &&  ownPet[1] == 4  && (
+      {item.name == "Water"   && (
       <Image
       width={50}
   radius={"none"}
@@ -636,7 +636,7 @@ labelPlacement="outside"
   src="/gotchi/Assets/Item_HolyWater.png"
   />
     )}
-          {item.name == "Moon Stone" && ownPet[1] == 4  && (
+          {item.name == "Moon Stone"  && (
       <Image
       width={80}
   radius={"none"}
@@ -660,8 +660,19 @@ labelPlacement="outside"
         <p className="text-small text-white">{item.name}</p> 
         <p className="text-small text-white">{item.name == "Beef" ? "Increase TOD and PTS" : item.name == "Water" ? "Increase TOD and PTS" : item.name == "Shield" ? "Prevent attack" : item.name == "Holy Water" ? "Revival Pet from Dead" : item.name == "Moon Stone" ? "Evol Pet": ""}</p> 
        
-  
-  <button type="button" style={{backgroundImage: "url(/gotchi/Assets/Buy_Button.png)"}} className="bg-no-repeat bg-center w-full h-16" onClick={()=>onBuyAccessory(item.id)}> </button>
+  {(ownPet && ownPet[1] == 4 &&  item.name == "Holy Water" )  && (
+    <button type="button" style={{backgroundImage: "url(/gotchi/Assets/Buy_Button.png)"}} className="bg-no-repeat bg-center w-full h-16" onClick={()=>onBuyAccessory(item.id)}> </button>
+  )}
+  {
+  (ownPet && ownPet[1] !== 4 &&  item.name !== "Holy Water" )  && (
+    <button type="button" style={{backgroundImage: "url(/gotchi/Assets/Buy_Button.png)"}} className="bg-no-repeat bg-center w-full h-16" onClick={()=>onBuyAccessory(item.id)}> </button>
+  )}
+  {(ownPet && ownPet[1] !== 4 &&  item.name == "Holy Water" )  && (
+      <p className="nes-btn w-full">  Can not buy item </p>
+  )}
+    {(ownPet && ownPet[1] == 4 &&  item.name !== "Holy Water" )  && (
+      <p className="nes-btn w-full">  Can not buy item </p>
+  )}
         </CardFooter>
       </Card>
   
