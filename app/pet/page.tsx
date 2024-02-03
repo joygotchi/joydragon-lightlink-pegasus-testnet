@@ -89,9 +89,14 @@ export default function PetPage() {
     let response : any= await fetch(`${process.env.EXPLORER_URL}/api/v2/tokens/${process.env.NFT_ADDRESS}/instances`)
     response = await response.json()
     const petArr : any = [];
+    let checkPet = false;
+    let checkPetId =  localStorage.getItem('pet')
     console.log("petcheck",response)
     if(response.items){
       for (const element of response.items) {
+        if(element.id == checkPetId){
+          checkPet = true
+        }
         const Info : any = await readContracts({
           contracts: [
             {
@@ -113,8 +118,11 @@ export default function PetPage() {
     }
     
     if(petArr[0]){
-      const pet = localStorage.getItem('pet');
+      let pet = null;
       let petId : any  = null ;
+      if(checkPet){
+        pet= localStorage.getItem('pet')
+      }
     if (pet) {
       setSelectedPet(pet);
       petId = BigInt(pet)

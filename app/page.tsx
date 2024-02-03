@@ -104,7 +104,7 @@ const { data: allowance, refetch } = useContractRead({
 		}
 	],
 	functionName: "getJoy",
-	args: [address],
+	args: [`0x${address?.slice(2)}`],
 	});
   
 	const {
