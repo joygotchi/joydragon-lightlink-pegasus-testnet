@@ -515,11 +515,15 @@ src="/gotchi/Assets/Dead.png"
   Ready for Evolution 3
  </Button>
     )}
-
+{ownPet && ownPet[1] == 4 && (
+    <Button  color="danger" variant="solid" size="sm" aria-label="Like" onClick={onEvol}>
+    Your pet is Dead and needs to use Holy water
+   </Button>
+)}
 
       </div>
   </div>
-<div className="col-start-1 col-end-4 text-white">Level {ownPet && ownPet[3].toString()} - EVOL {ownPetEvol && ownPetEvol[1].toString()} 
+<div className="col-start-1 col-end-4 text-white">Level {ownPet && ownPet[3].toString()} - EVOL {ownPetEvol && ownPetEvol[1].toString()}   
 
  </div>
 <div className="col-end-7 col-span-3">
@@ -583,8 +587,8 @@ labelPlacement="outside"
 <div className="col-start-1 col-end-7 ">
   <Progress size="sm" color="default" aria-label="" value={100} /></div>
 
-  <div className="col-start-1 col-end-3 text-white ">Reward</div>
-<div className="col-end-8 col-span-2  text-white">{ownPet ? ownPet[8].toString() : ''} ETH</div>
+  <div className="col-start-1 col-end-3 text-white ">{ownPetEvol && ownPetEvol[4] == 0 ? "male" : ownPetEvol && ownPetEvol[4] == 1 ? "female" : ""}</div>
+<div className="col-end-8 col-span-3  text-white">Reward:{ownPet ? ownPet[8].toString() : ''} ETH</div>
 
 
 </div>

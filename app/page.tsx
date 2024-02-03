@@ -61,7 +61,7 @@ const { data: allowance, refetch } = useContractRead({
 		abi: nftAbi,
 		functionName: 'mint',
 	  })
-	  const { data, error, isError, write : mint } = useContractWrite(config)
+	  const { data, error, isError, writeAsync : mint } = useContractWrite(config)
 	 
 	  const { isLoading, isSuccess } = useWaitForTransaction({
 		hash: data?.hash,

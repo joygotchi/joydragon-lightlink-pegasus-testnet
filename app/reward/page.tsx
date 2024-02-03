@@ -111,7 +111,7 @@ const debouncedOwnPetId = useDebounce(ownPetId, 500)
       </CardHeader>
       <Divider/>
       <CardBody>
-		<h1>RECEIVE:{ownPet && ownPet[8].toString()} Vic</h1>
+		<h1>RECEIVE:{ownPet && ownPet[8].toString()} {process.env.SYMBOL}</h1>
       </CardBody>
       <Divider/>
     </Card>

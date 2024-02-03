@@ -12,7 +12,7 @@ import { Chain } from '@wagmi/core'
 export const vicTestnet = {
   id: process.env.CHAIN_ID as any ,
   name: process.env.CHAIN_NAME  as string,
-  network: 'viction',
+  network: process.env.CHAIN_NAME  as string,
   nativeCurrency: {
     decimals: 18,
     name: process.env.TOKEN as string,
