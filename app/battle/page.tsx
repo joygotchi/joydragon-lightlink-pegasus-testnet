@@ -42,10 +42,10 @@ export default function Battle() {
 	  
 	  console.log(data);
 	//   let petList = data?.data.filter((item:any) =>item.address !== address && item.address !== '0x0000000000000000000000000000000000000000') ;
-	let petList = data?.items.filter((item:any) =>item.owner.hash !== address && item.owner.hash !== '0x0000000000000000000000000000000000000000');
+	let petList = data?.items?.filter((item:any) =>item.owner.hash !== address && item.owner.hash !== '0x0000000000000000000000000000000000000000');
 	  
 	
-	  const loadingState = isLoading || data?.items.length === 0 ? "loading" : "idle";
+	  const loadingState = isLoading || data?.items?.length === 0 ? "loading" : "idle";
 
 	  const rowsPerPage = 20;
 	  const pages = useMemo(() => {

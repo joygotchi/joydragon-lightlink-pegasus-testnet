@@ -15,6 +15,7 @@ import {
 	useAccount,
 	useConnect,
 	useNetwork, 
+	useBalance,
 	useSwitchNetwork
   } from "wagmi";
   
@@ -22,7 +23,11 @@ const MAX_ALLOWANCE = BigInt('20000000000000000000000')
 
 //https://wagmi.sh/examples/contract-write
 export default function Home() {
-//check allowrance
+	const { chain  } = useNetwork()
+	const [isClient, setIsClient] = React.useState(true)
+	const [isBlance, setIsBlance] = React.useState(false)
+	const [isEthBlance, setEthBlance] = React.useState(false)
+	const [isApprove, setIsApprove] = React.useState(false)
 const { address} = useAccount()
 const { data: allowance, refetch } = useContractRead({
     address: `0x${process.env.TOKEN_ADDRESS?.slice(2)}`,
@@ -37,18 +42,79 @@ const { data: allowance, refetch } = useContractRead({
 	functionName: "approve",
 	args: [`0x${process.env.NFT_ADDRESS?.slice(2)}`, MAX_ALLOWANCE],
   });
-
+  const { data: tokenBlanceData, isError: tokenBlanceError } = useBalance({
+    address: address,
+    token: `0x${process.env.TOKEN_ADDRESS?.slice(2)}`,
+  });
+  const { data: ethBlanceData, isError: ethBlanceError } = useBalance({
+    address: address
+  });
   const {
     data: approveResult,
     writeAsync: approveAsync,
     error:errorAllowance,
   } = useContractWrite(configAllowance);
 
+  const { config : configFaucet } = usePrepareContractWrite({
+	address: `0x${process.env.FAUCET_ADDRESS?.slice(2)}`,
+	abi: [
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_token",
+					"type": "address"
+				}
+			],
+			"stateMutability": "nonpayable",
+			"type": "constructor"
+		},
+		{
+			"inputs": [
+				{
+					"internalType": "address",
+					"name": "_to",
+					"type": "address"
+				}
+			],
+			"name": "getJoy",
+			"outputs": [],
+			"stateMutability": "nonpayable",
+			"type": "function"
+		},
+		{
+			"inputs": [],
+			"name": "token",
+			"outputs": [
+				{
+					"internalType": "contract IERC20",
+					"name": "",
+					"type": "address"
+				}
+			],
+			"stateMutability": "view",
+			"type": "function"
+		}
+	],
+	functionName: "getJoy",
+	args: [address],
+	});
+  
+	const {
+	  data: faucetData,
+	  writeAsync: setFaucetAsync,
+	  error:errorFaucet,
+	} = useContractWrite(configFaucet);
+
+	const onFaucet = ()=> {
+		setFaucetAsync?.();
+		fetchMyAPI();
+		};
   
   const { isLoading : isLoadingApprove} = useWaitForTransaction({
 	hash: approveResult?.hash,
 		onSuccess(data) {
-			setIsApprove(true);
+			fetchMyAPI();
 		}
   })
 	
@@ -65,12 +131,13 @@ const { data: allowance, refetch } = useContractRead({
 	 
 	  const { isLoading, isSuccess } = useWaitForTransaction({
 		hash: data?.hash,
+		onSuccess(data) {
+			fetchMyAPI();
+		}
 	  })
 	  
 
-	  const { chain  } = useNetwork()
-	  const [isClient, setIsClient] = React.useState(true)
-	  const [isApprove, setIsApprove] = React.useState(false)
+
 	  const { chains , error : errorSwitchNetwork, isLoading : loadingSwingNetwork, pendingChainId, switchNetwork } =
 		useSwitchNetwork({
 			onMutate(args) {
@@ -78,26 +145,37 @@ const { data: allowance, refetch } = useContractRead({
 			  },
 			onSettled(data, error) {
 				console.log('Settled', { data, error })
-				setIsClient(true);
+				fetchMyAPI();
 			},
 			onSuccess(data) {
 				console.log('sucess', { data })
-				setIsClient(true);
+				fetchMyAPI();
 			  }
 		  })
-		React.useEffect(() => {
-			
+		  const fetchMyAPI = async() => {
 			if(allowance){
 				console.log("allowance",allowance)
 				if(allowance >= BigInt(20000)){
 					setIsApprove(true)
 				}
 			}
-
+			if(Number(tokenBlanceData?.formatted) > 0){
+				console.log("balance",tokenBlanceData)
+				setIsBlance(true)
+			}
+			console.log("ethbalance",ethBlanceData)
+			if(Number(ethBlanceData?.formatted) > 0.001){
+				console.log("balance",tokenBlanceData)
+				setEthBlance(true)
+			}
 			if(chain?.id == process.env.CHAIN_ID){
 			setIsClient(true);
 			}
-		},[])
+		}
+		React.useEffect(() => {
+			fetchMyAPI();
+
+		},[allowance,tokenBlanceData])
 	return (
 		<section className="h-full max-w-lg  mx-auto font-medium bg-slate-50 px-8 bg-no-repeat bg-container bg-gray-500 bg-center" style={{backgroundImage: "url(/Assets/landing.png)"}}>
  
@@ -109,21 +187,53 @@ const { data: allowance, refetch } = useContractRead({
 
 {isClient ? (
 (!isApprove) ? (
-	<div className="pb-5" style={{paddingTop:"130%"}}>
-			<button type="button"   onClick={approveAsync} className="nes-btn bg-white w-full" >
-	Approval
+	(isBlance) ? (
+		<div className="pb-5" style={{paddingTop:"130%"}}>
+		<button type="button"   onClick={approveAsync} className="nes-btn bg-white w-full" >
+Approval
 </button>
-	</div>
-
-
+</div>
+	) : (
+		<div className="pb-5" style={{paddingTop:"130%"}}>
+		<button type="button"   onClick={onFaucet} className="nes-btn bg-white w-full" >
+Faucet $JGT Token
+</button>
+</div>
+	)
    ):(
+	(isBlance && isEthBlance) ? (
 <>
 <div className="pb-5"  style={{paddingTop:"130%"}}>
-<button type="button" style={{backgroundImage: "url(/Assets/mint.png)"}} className=" bg-no-repeat bg-center w-full h-16 " disabled={!mint || isLoading} onClick={mint}> </button>
+<button type="button" style={{backgroundImage: "url(/Assets/press_to_mint.gif)"}} className=" bg-no-repeat bg-center w-full h-16 " onClick={mint}> </button>
 	
 </div>
 
 </>
+	) :(
+		(!isBlance) ? (
+			<div className="pb-5" style={{paddingTop:"130%"}}>
+			<button type="button"   onClick={onFaucet} className="nes-btn bg-white w-full" >
+	Faucet $JGT Token
+	</button>
+	</div>
+		) :(
+
+			<div className="pb-5" style={{paddingTop:"130%"}}>
+					<Button
+      href={process.env.URL_FAUCET as string}
+      as={Link}
+	  className="w-full"
+      color="primary"
+      showAnchorIcon
+      variant="solid"
+    >
+      Faucet ${process.env.TOKEN as string} Testnet
+    </Button>
+	</div>
+		)
+
+	)
+
 
    )
 
@@ -159,25 +269,8 @@ const { data: allowance, refetch } = useContractRead({
         <div><span className="text-red-400">Error: {error?.message}</span></div>
       )} */}
 			<div className="flex gap-3">
-		
-			<Button
-      href={process.env.URL_FAUCET as string}
-      as={Link}
-      color="primary"
-      showAnchorIcon
-      variant="solid"
-    >
-      Faucet ${process.env.TOKEN as string} Testnet
-    </Button>
-	<Button
-     href="/faucet"
-      as={Link}
-      color="primary"
-      showAnchorIcon
-      variant="solid"
-    >
-      Faucet $Joy token
-    </Button>
+	
+
 				
 				
 			</div>

@@ -9,9 +9,9 @@ const nextConfig = {
         SYMBOL: "ETH",
         RPC: "https://replicator.pegasus.lightlink.io/rpc/v1",
         URL_FAUCET: "https://faucet.pegasus.lightlink.io/",
-        NFT_ADDRESS:'0x3C68D401b0082Ed833f6d285Df615254DdDDB5a2',
-        TOKEN_ADDRESS:'0xf898ddC2dBaC71AF98D054fD3DEE0284f4aB9483',
-        FAUCET_ADDRESS:'0x17D36ECA9CFA04C7435FE60447091C0872733c47',
+        NFT_ADDRESS:'0x32f93910803B544C4c58240cc5E7B94678A4BD57',
+        TOKEN_ADDRESS:'0xc9D2EDF36Ed48Cc3110c2D833bAc3420df12Ba5a',
+        FAUCET_ADDRESS:'0xCC5D4595ec07e570d00ad7eF3213062071E5E00f',
         EXPLORER_URL:'https://pegasus.lightlink.io'
       },
 }

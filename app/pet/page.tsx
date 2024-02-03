@@ -608,21 +608,21 @@ labelPlacement="outside"
          <div className="col-start-1 col-end-7 ">
   
   <div className="flex justify-center pt-7">
-    {item.name == "Beef" && (
+    {item.name == "Beef" && ownPet[1] == 4  && (
       <Image
       width={100}
   radius={"none"}
   src="/gotchi/Assets/Item_Beef.png"
   />
     )}
-    {item.name == "Shield" && (
+    {item.name == "Shield" && ownPet[1] == 4  && (
       <Image
       width={80}
   radius={"none"}
   src="/gotchi/Assets/Item_Shield.png"
   />
     )}
-      {item.name == "Water" && (
+      {item.name == "Water" &&  ownPet[1] == 4  && (
       <Image
       width={50}
   radius={"none"}
@@ -636,7 +636,7 @@ labelPlacement="outside"
   src="/gotchi/Assets/Item_HolyWater.png"
   />
     )}
-          {item.name == "Moon Stone" && (
+          {item.name == "Moon Stone" && ownPet[1] == 4  && (
       <Image
       width={80}
   radius={"none"}
