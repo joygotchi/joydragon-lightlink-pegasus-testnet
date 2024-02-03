@@ -90,13 +90,14 @@ export default function PetPage() {
     response = await response.json()
     const petArr : any = [];
     let checkPet = false;
-    let checkPetId =  localStorage.getItem('pet')
+    let checkPetId = await localStorage.getItem('pet')
+    console.log("checkPetId",checkPetId , typeof checkPetId)
     console.log("petcheck",response)
     if(response.items){
       for (const element of response.items) {
-        if(element.id == checkPetId){
-          checkPet = true
-        }
+
+        if(element.owner.hash == address){
+          
         const Info : any = await readContracts({
           contracts: [
             {
@@ -107,8 +108,9 @@ export default function PetPage() {
             }
           ],
         })
-        console.log("Info",Info)
-        if(element.owner.hash == address){
+          if(element.id == checkPetId){
+            checkPet = true
+          }
           petArr.push({
             value:element.id,
             label:Info[0].result[0]
@@ -121,6 +123,7 @@ export default function PetPage() {
       let pet = null;
       let petId : any  = null ;
       if(checkPet){
+        console.log("petcheck",checkPet)
         pet= localStorage.getItem('pet')
       }
     if (pet) {
