@@ -18,7 +18,7 @@ import {
 	useSwitchNetwork
   } from "wagmi";
   
-const MAX_ALLOWANCE = BigInt('20000000000000000000000')
+const MAX_ALLOWANCE = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff')
 
 //https://wagmi.sh/examples/contract-write
 export default function Home() {
