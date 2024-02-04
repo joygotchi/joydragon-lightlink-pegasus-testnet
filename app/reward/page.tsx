@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import {Card, CardBody , CardHeader , Divider , Image ,Button} from "@nextui-org/react";
 import { nftAbi , tokenAbi } from '../../abi';
-import { readContracts , watchAccount  } from '@wagmi/core'
+import { readContracts , watchAccount ,writeContract ,prepareWriteContract } from '@wagmi/core'
 import {
 	usePrepareContractWrite,
 	useContractWrite,
@@ -15,82 +15,53 @@ import {
 export default function RewardPage() {
 	const [ownPet, setOwnPet] = useState<any>(null)
 const [ownPetId, setOwnPetId] = useState<any>(null)
-const debouncedOwnPetId = useDebounce(ownPetId, 500)
-	useEffect(() => {
-		async function fetchMyAPI() {
-		  let response : any= await fetch(`${process.env.EXPLORER_URL}/api/tokentx/nft/list?tokenAddress=${process.env.TOKEN_ADDRESS}`)
-		  response = await response.json()
+const { address } = useAccount();
+const fetchMyAPI = async() => {
+	let response : any= await fetch(`${process.env.EXPLORER_URL}/api/tokentx/nft/list?tokenAddress=${process.env.TOKEN_ADDRESS}`)
+	response = await response.json()
 
-		  const pet = localStorage.getItem('pet');
-		  let petId : any  = null ;
-		if (pet) {
-		  petId = BigInt(pet)
-		  const Info : any = await readContracts({
-			contracts: [
-			  {
-				address: `0x${process.env.NFT_ADDRESS?.slice(2)}`,
-				abi: nftAbi,
-				functionName: 'getPetInfo',
-				args: [petId],
-			  }
-			],
-		  })
-		  setOwnPet(Info[0].result)
-		  setOwnPetId(pet);
+	const pet = localStorage.getItem('pet');
+	let petId : any  = null ;
+  if (pet) {
+	petId = BigInt(pet)
+	const Info : any = await readContracts({
+	  contracts: [
+		{
+		  address: `0x${process.env.NFT_ADDRESS?.slice(2)}`,
+		  abi: nftAbi,
+		  functionName: 'getPetInfo',
+		  args: [petId],
 		}
-	    
-		}
+	  ],
+	})
+	setOwnPet(Info[0].result)
+	setOwnPetId(pet);
+  }
+  
+  }
+	useEffect(() => {
+
 		fetchMyAPI()
 	  }, [])
+	  const onRedeem = async() =>{
+		const config =  await prepareWriteContract({
+		  address: `0x${address?.slice(2)}`,
+		  abi: nftAbi,
+		  functionName: "redeem",
+		  args: [ownPetId]})
+		 const tx = await writeContract(config);
+		 if(tx){
+			console.log("tx",tx);
+			fetchMyAPI()
+			// let response : any= await fetch(`${process.env.EXPLORER_URL}/api/v2/transactions/${tx.hash}/logs`)
+    		// response = await response.json()
+			// console.log("logs",response);
+		  //fetchMyAPI();
+		 }
 
-
-	  const { config : configRedeem } = usePrepareContractWrite({
-		address: `0x${process.env.NFT_ADDRESS?.slice(2)}`,
-		abi: nftAbi,
-		functionName: "redeem",
-		args: [debouncedOwnPetId ],
-
-		});
-	  
-		const {
-		  data: RedeemData,
-		  writeAsync: setRedeemAsync,
-		  error:errorRedeem,
-		} = useContractWrite(configRedeem);
-
-		
-		const { isLoading : isLoadingAttack} = useWaitForTransaction({
-			hash: RedeemData?.hash,
-			onSuccess(data) {
-				async function fetchMyAPI() {
-					
-		  
-					const pet = localStorage.getItem('pet');
-					let petId : any  = null ;
-				  if (pet) {
-					petId = BigInt(pet)
-					const Info : any = await readContracts({
-					  contracts: [
-						{
-						  address: `0x${process.env.NFT_ADDRESS?.slice(2)}`,
-						  abi: nftAbi,
-						  functionName: 'getPetInfo',
-						  args: [petId],
-						}
-					  ],
-					})
-					setOwnPet(Info[0].result)
-					setOwnPetId(pet);
-				  }
-				  
-				  }
-				  fetchMyAPI()
-			},
-		  })
-		  const onRedeem = ()=> {
-			setRedeemAsync?.();
-			};
-
+	 }
+	
+	
 
 	return (
 		<div className="pt-20">

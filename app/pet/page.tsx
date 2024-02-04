@@ -534,7 +534,7 @@ src="/gotchi/Assets/Dead.png"
 
       </div>
   </div>
-<div className="col-start-1 col-end-4 text-white">Level {ownPet && ownPet[3].toString()} - EVOL {ownPetEvol && ownPetEvol[1].toString()}   
+<div className="col-start-1 col-end-4 text-white">Level {ownPet && ownPet[3].toString()} - EVOL {ownPetEvol &&  ownPetEvol[1] == 0 ? "1" : ownPetEvol[1] == 1 ? "2" : ownPetEvol[1] == 2 ? "3" :""}   
 
  </div>
 <div className="col-end-7 col-span-3">
